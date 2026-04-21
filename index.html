@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Relatório Diário - 6º BBM</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 850px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        h2 {
+            text-align: center;
+            color: #b22222;
+            border-bottom: 2px solid #b22222;
+            padding-bottom: 10px;
+        }
+
+        .secao {
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            border-left: 4px solid #b22222;
+        }
+
+        .secao h3 {
+            margin-top: 0;
+            color: #444;
+            font-size: 16px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            align-items: flex-end;
+            flex-wrap: wrap;
+        }
+
+        .form-group {
+            flex: 1;
+            min-width: 120px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            font-size: 13px;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 10px;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-family: inherit;
+        }
+
+        textarea {
+            resize: vertical;
+        }
+
+        .btn-principal {
+            background-color: #b22222;
+            color: white;
+            border: none;
+            padding: 15px 20px;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 18px;
+            font-weight: bold;
+            width: 100%;
+            margin-top: 10px;
+            transition: background 0.3s;
+        }
+
+        .btn-principal:hover {
+            background-color: #8b0000;
+        }
+
+        .btn-adicionar {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+
+        .btn-remover {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            border-radius: 4px;
+            font-weight: bold;
+            height: 40px;
+            width: 40px;
+        }
+
+        .separador {
+            border-top: 1px solid #ddd;
+            margin: 15px 0;
+            padding-top: 15px;
+        }
+
+        /* Estilos específicos para a caixa de Ocorrência */
+        .ocorrencia-item {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+        }
+
+        .ocorrencia-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            font-weight: bold;
+            color: #b22222;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>🚒 Gerador de Parte Diária - 6º BBM</h2>
+        
+        <div class="secao">
+            <h3>Cabeçalho e Data</h3>
+            <div class="form-group">
+                <label for="data-servico">Data do Serviço:</label>
+                <input type="date" id="data-servico">
+            </div>
+        </div>
+
+        <div class="secao">
+            <h3>1 - Guarnição Operacional</h3>
+            
+            <div id="lista-guarnicao"></div>
+            
+            <button type="button" class="btn-adicionar" onclick="adicionarMembro('', '', '')">+ Adicionar Militar</button>
+
+            <div class="separador"></div>
+
+            <div class="form-group">
+                <label>Operador de Comunicações:</label>
+                <select id="comunicacao">
+                    <option value="Rodrigo Santos (funcionário civil)">Rodrigo Santos (funcionário civil)</option>
+                    <option value="Maykon Araújo (funcionário civil)">Maykon Araújo (funcionário civil)</option>
+                    <option value="Lucas Henrique (funcionário civil)">Lucas Henrique (funcionário civil)</option>
+                    <option value="Filipe Cunha (funcionário civil)">Filipe Cunha (funcionário civil)</option>
+                </select>
+            </div>
+        </div>
+
+        <div class="secao">
+            <h3>2 a 5 - Viaturas e Materiais</h3>
+            <label>Viaturas:</label>
+            <textarea id="viaturas" rows="3">- AR-78
+- ABT-14 (OPERANTE COM RESTRIÇÕES NO AR CONDICIONADO);
+- ESC-01</textarea>
+            
+            <label style="margin-top:10px;">Materiais Operacionais:</label>
+            <textarea id="mat-op" rows="6">- MOTOSSERRAS: (02 OPERANTES);
+- DESENCARCERADOR: (OPERANTE);
+- MINI RETÍFICA: (OPERANTE)
+- EMBARCAÇÃO COM MOTOR DE POPA
+- RÁDIO DE MESA (CENTRAL DE COMUNICAÇÃO)
+- RÁDIO HT: (04 OPERANTES SEM RESTRIÇÕES);
+- SOPRADOR (OPERANTE SEM RESTRIÇÕES).
+- COMPRESSOR DE AR COMPRIMIDO (OPERANTE SEM RESTRIÇÕES)</textarea>
+
+            <label style="margin-top:10px;">Armamento:</label>
+            <textarea id="armamento" rows="2">PISTOLA - PT 100 AF CAL.40 SVI64254
+01 CARREGADOR COM 08 MUNIÇÕES;</textarea>
+
+            <label style="margin-top:10px;">Materiais Administrativos:</label>
+            <textarea id="mat-adm" rows="4">- ESCALA DE CHEFE DE SOCORRO; 
+- LIVRO DO TELEFONISTA;
+- NOTEBOOK (SALA DE COMUNICAÇÃO);
+- TELEFONE CELULAR DE EMERGÊNCIA
+- Nº DE CONTATO (99)98248-9658</textarea>
+        </div>
+
+        <div class="secao">
+            <h3>6 - Ocorrências</h3>
+            
+            <div id="lista-ocorrencias"></div>
+            
+            <button type="button" class="btn-adicionar" onclick="adicionarOcorrencia()">+ Adicionar Ocorrência</button>
+        </div>
+
+        <button id="btn-copiar" class="btn-principal" onclick="gerarECopiar()">Copiar Relatório</button>
+    </div>
+
+    <script>
+        // Seta a data de hoje automaticamente
+        document.getElementById('data-servico').valueAsDate = new Date();
+
+        function formatarData(dataISO) {
+            if(!dataISO) return "";
+            const partes = dataISO.split('-');
+            return `${partes[2]}/${partes[1]}/${partes[0]}`;
+        }
+
+        // ==========================================
+        // LÓGICA DA GUARNIÇÃO OPERACIONAL
+        // ==========================================
+        const postosDisponiveis = [
+            "CAP. QOCBM",
+            "1° SGT",
+            "2° SGT",
+            "3° SGT",
+            "Asp of BM",
+            "CB BM"
+        ];
+
+        // Esconde o Select e mostra o Input de texto no mesmo lugar
+        function verificarFuncaoOutra(selectElement) {
+            if (selectElement.value === "OUTRA") {
+                const wrapper = selectElement.parentElement;
+                selectElement.style.display = "none";
+                const containerOutra = wrapper.querySelector('.container-outra');
+                containerOutra.style.display = "flex";
+                containerOutra.querySelector('.input-funcao-outra').focus();
+            }
+        }
+
+        // Função para voltar para a lista (esconde o input e mostra o select)
+        function reverterFuncao(btnElement) {
+            const containerOutra = btnElement.parentElement;
+            const wrapper = containerOutra.parentElement;
+            const selectElement = wrapper.querySelector('.select-funcao');
+            
+            containerOutra.style.display = "none";
+            containerOutra.querySelector('.input-funcao-outra').value = ""; // Limpa o que foi digitado
+            
+            selectElement.value = "CHEFE DE SOCORRO"; // Volta para a primeira opção
+            selectElement.style.display = "block";
+        }
+
+        function adicionarMembro(funcao, posto, nome) {
+            const container = document.getElementById('lista-guarnicao');
+            const div = document.createElement('div');
+            div.className = 'form-row linha-membro';
+            
+            let opcoesPosto = postosDisponiveis.map(p => 
+                `<option value="${p}" ${p === posto ? 'selected' : ''}>${p}</option>`
+            ).join('');
+
+            // Define "CHEFE DE SOCORRO" como padrão caso a função venha vazia (ao clicar no botão + Adicionar)
+            const funcoesPadrao = ["CHEFE DE SOCORRO", "CMT DE GUARNIÇÃO", "MOTORISTA", "CHEFE DE LINHA"];
+            let funcaoInicial = funcao || "CHEFE DE SOCORRO";
+            const isOutra = !funcoesPadrao.includes(funcaoInicial);
+
+            div.innerHTML = `
+                <div class="form-group" style="flex: 1.5;">
+                    <label>Função:</label>
+                    <div style="display: flex; align-items: center; width: 100%;">
+                        <select class="select-funcao" onchange="verificarFuncaoOutra(this)" style="display: ${isOutra ? 'none' : 'block'}; width: 100%;">
+                            <option value="CHEFE DE SOCORRO" ${funcaoInicial === 'CHEFE DE SOCORRO' ? 'selected' : ''}>CHEFE DE SOCORRO</option>
+                            <option value="CMT DE GUARNIÇÃO" ${funcaoInicial === 'CMT DE GUARNIÇÃO' ? 'selected' : ''}>CMT DE GUARNIÇÃO</option>
+                            <option value="MOTORISTA" ${funcaoInicial === 'MOTORISTA' ? 'selected' : ''}>MOTORISTA</option>
+                            <option value="CHEFE DE LINHA" ${funcaoInicial === 'CHEFE DE LINHA' ? 'selected' : ''}>CHEFE DE LINHA</option>
+                            <option value="OUTRA" ${isOutra ? 'selected' : ''}>OUTRA...</option>
+                        </select>
+                        
+                        <div class="container-outra" style="display: ${isOutra ? 'flex' : 'none'}; width: 100%; gap: 5px;">
+                            <input type="text" class="input-funcao-outra" placeholder="Digite a função..." value="${isOutra ? funcaoInicial : ''}" style="width: 100%;">
+                            <button type="button" onclick="reverterFuncao(this)" style="padding: 0 10px; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer;" title="Voltar para a lista">↺</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group" style="flex: 1.2;">
+                    <label>Posto/Grad.:</label>
+                    <select class="input-posto">
+                        ${opcoesPosto}
+                    </select>
+                </div>
+                <div class="form-group" style="flex: 2;">
+                    <label>Nome do Militar:</label>
+                    <input type="text" class="input-nome" value="${nome}" placeholder="Nome de Guerra">
+                </div>
+                <button type="button" class="btn-remover" onclick="this.parentElement.remove()" title="Remover Militar">X</button>
+            `;
+            container.appendChild(div);
+        }
+
+        // ==========================================
+        // LÓGICA DAS OCORRÊNCIAS
+        // ==========================================
+        function adicionarOcorrencia() {
+            const container = document.getElementById('lista-ocorrencias');
+            const div = document.createElement('div');
+            div.className = 'ocorrencia-item';
+
+            div.innerHTML = `
+                <div class="ocorrencia-header">
+                    <span>Nova Ocorrência</span>
+                    <button type="button" class="btn-remover" style="height: 30px; width: 30px; padding: 0; font-size: 12px;" onclick="this.parentElement.parentElement.remove()">X</button>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Tipo / Título (Opcional):</label>
+                        <input type="text" class="oc-tipo" placeholder="Ex: Captura de animal(cobra)">
+                    </div>
+                    <div class="form-group">
+                        <label>Sinesp CAD:</label>
+                        <input type="text" class="oc-sinesp" placeholder="Ex: COB-6BBM...">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Solicitante:</label>
+                        <input type="text" class="oc-solicitante" placeholder="Nome do solicitante">
+                    </div>
+                    <div class="form-group">
+                        <label>Endereço:</label>
+                        <input type="text" class="oc-endereco" placeholder="Local da ocorrência">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>Narrativa:</label>
+                    <textarea class="oc-narrativa" rows="3" placeholder="A GUARNIÇÃO FOI COMUNICADA..."></textarea>
+                </div>
+            `;
+            container.appendChild(div);
+        }
+
+        // ==========================================
+        // INICIALIZAÇÃO DA PÁGINA
+        // ==========================================
+        window.addEventListener('DOMContentLoaded', () => {
+            // Removido o preenchimento automático da guarnição.
+            // A lista iniciará vazia e você adiciona manualmente clicando no botão.
+
+            // Deixa 1 bloco de ocorrência vazio por padrão
+            adicionarOcorrencia();
+        });
+
+        // ==========================================
+        // GERAÇÃO DO TEXTO E CÓPIA
+        // ==========================================
+        function gerarECopiar() {
+            const dataServico = formatarData(document.getElementById('data-servico').value);
+            
+            // 1. Processar Guarnição
+            let guarnicaoTexto = "1 - GUARNIÇÃO OPERACIONAL:\n";
+            const linhas = document.querySelectorAll('.linha-membro');
+            let letraAscii = 65; 
+
+            linhas.forEach((linha) => {
+                const selectFuncao = linha.querySelector('.select-funcao');
+                const containerOutra = linha.querySelector('.container-outra');
+                
+                let funcaoReal = selectFuncao.value;
+                // Se o Select estiver escondido, significa que estamos usando o campo "OUTRA"
+                if (selectFuncao.style.display === "none") {
+                    funcaoReal = containerOutra.querySelector('.input-funcao-outra').value.toUpperCase() || "NÃO INFORMADA";
+                }
+                
+                const posto = linha.querySelector('.input-posto').value;
+                const nome = linha.querySelector('.input-nome').value;
+                const letra = String.fromCharCode(letraAscii);
+                
+                guarnicaoTexto += `${letra}) ${funcaoReal}: \n${posto} ${nome}\n`;
+                letraAscii++;
+            });
+
+            const comunicacao = document.getElementById('comunicacao').value;
+            const letraFinal = String.fromCharCode(letraAscii);
+            guarnicaoTexto += `${letraFinal}) OPERADOR DE COMUNICAÇÕES:\n${comunicacao}\n`;
+            
+            // 2. Capturar Textareas Estáticos
+            const viaturas = document.getElementById('viaturas').value;
+            const matOp = document.getElementById('mat-op').value;
+            const armamento = document.getElementById('armamento').value;
+            const matAdm = document.getElementById('mat-adm').value;
+
+            // 3. Processar Ocorrências
+            let ocorrenciasTexto = "";
+            const blocosOcorrencia = document.querySelectorAll('.ocorrencia-item');
+            
+            if(blocosOcorrencia.length === 0) {
+                ocorrenciasTexto = "Sem alterações.";
+            } else {
+                blocosOcorrencia.forEach((bloco, index) => {
+                    const tipo = bloco.querySelector('.oc-tipo').value;
+                    const solicitante = bloco.querySelector('.oc-solicitante').value;
+                    const endereco = bloco.querySelector('.oc-endereco').value;
+                    const narrativa = bloco.querySelector('.oc-narrativa').value;
+                    const sinesp = bloco.querySelector('.oc-sinesp').value;
+
+                    ocorrenciasTexto += `${index + 1}° Ocorrência.\n`;
+                    if (tipo.trim() !== '') {
+                        ocorrenciasTexto += `${tipo}\n`;
+                    }
+                    ocorrenciasTexto += `Solicitante: ${solicitante}\n`;
+                    ocorrenciasTexto += `Endereço: ${endereco}\n`;
+                    ocorrenciasTexto += `Narrativa: ${narrativa}\n`;
+                    ocorrenciasTexto += `Sinesp CAD: ${sinesp}\n\n`;
+                });
+            }
+
+            // Estrutura o texto final
+            const textoFinal = `6° BATALHÃO DE BOMBEIROS MILITAR
+CMT DA ÁREA NORTE: CEL QOCBM HÉLIO
+CMT DO 6°BBM: MAJ DAVID HARISSON ABREU
+
+GUARNIÇÃO DE SERVIÇO DO DIA ${dataServico}
+
+${guarnicaoTexto}
+2 - VIATURAS
+${viaturas}
+
+3 - MATERIAIS OPERACIONAIS:
+${matOp}
+
+4 - ARMAMENTO
+${armamento}
+
+5 - MATERIAIS ADMINISTRATIVOS
+${matAdm}
+
+6. Ocorrências :
+${ocorrenciasTexto.trim()}
+
+Vidas Alheia Riqueza Salvar`;
+
+            // Copia para a área de transferência
+            navigator.clipboard.writeText(textoFinal).then(() => {
+                const btn = document.getElementById('btn-copiar');
+                const textoOriginal = btn.innerText;
+                btn.innerText = '✅ Relatório Copiado!';
+                btn.style.backgroundColor = '#28a745';
+                setTimeout(() => {
+                    btn.innerText = textoOriginal;
+                    btn.style.backgroundColor = '#b22222';
+                }, 3000);
+            }).catch(err => {
+                alert('Erro ao copiar. Verifique as permissões do seu navegador.');
+                console.error(err);
+            });
+        }
+    </script>
+</body>
+</html>
