@@ -142,6 +142,24 @@
             color: #b22222;
             border-bottom: 1px solid #eee;
             padding-bottom: 5px;
+            gap: 10px;
+        }
+
+        .toggle-narrativa {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin: 0 0 0 auto;
+            font-size: 13px;
+            color: #333;
+            cursor: pointer;
+            white-space: nowrap;
+        }
+
+        .toggle-narrativa input {
+            width: auto;
+            margin: 0;
+            cursor: pointer;
         }
     </style>
 </head>
@@ -173,7 +191,7 @@
                     <option value="Rodrigo Santos (funcionário civil)">Rodrigo Santos (funcionário civil)</option>
                     <option value="Maykon Araújo (funcionário civil)">Maykon Araújo (funcionário civil)</option>
                     <option value="Lucas Henrique (funcionário civil)">Lucas Henrique (funcionário civil)</option>
-                    <option value="Filipe Cunha (funcionário civil)">Filipe Cunha (funcionário civil)</option>
+                    <option value="Marco Antonio (funcionário civil)">Marco Antonio (funcionário civil)</option>
                 </select>
             </div>
         </div>
@@ -181,8 +199,8 @@
         <div class="secao">
             <h3>2 a 5 - Viaturas e Materiais</h3>
             <label>Viaturas:</label>
-            <textarea id="viaturas" rows="3">- AR-78
-- ABT-14 (OPERANTE COM RESTRIÇÕES NO AR CONDICIONADO);
+            <textarea id="viaturas" rows="3">- AR-90
+- ABT-37
 - ESC-01</textarea>
             
             <label style="margin-top:10px;">Materiais Operacionais:</label>
@@ -209,6 +227,13 @@
 
         <div class="secao">
             <h3>6 - Ocorrências</h3>
+
+            <div style="background:#fff; border:1px dashed #b22222; border-radius:5px; padding:15px; margin-bottom:15px;">
+                <label for="colar-sistema">📋 Colar ocorrência do sistema:</label>
+                <textarea id="colar-sistema" rows="5" placeholder="Cole aqui o texto copiado do sistema (pode colar mais de uma ocorrência de uma vez)..."></textarea>
+                <button type="button" class="btn-adicionar" style="margin:10px 0 0;" onclick="importarOcorrencias()">⚡ Preencher automaticamente</button>
+                <span id="msg-importar" style="margin-left:10px; font-size:13px; font-weight:bold;"></span>
+            </div>
             
             <div id="lista-ocorrencias"></div>
             
@@ -228,16 +253,32 @@
             return `${partes[2]}/${partes[1]}/${partes[0]}`;
         }
 
+        // Escapa texto para uso seguro dentro de atributos/HTML
+        function esc(texto) {
+            return String(texto || '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;');
+        }
+
         // ==========================================
         // LÓGICA DA GUARNIÇÃO OPERACIONAL
         // ==========================================
         const postosDisponiveis = [
+            "CEL QOCBM",
+            "TEN CEL QOCBM",
+            "MAJ QOCBM",
             "CAP. QOCBM",
+            "1° TEN QOCBM",
+            "2° TEN QOCBM",
+            "Asp of BM",
+            "SUBTEN BM",
             "1° SGT",
             "2° SGT",
             "3° SGT",
-            "Asp of BM",
-            "CB BM"
+            "CB BM",
+            "SD BM"
         ];
 
         // Esconde o Select e mostra o Input de texto no mesmo lugar
@@ -291,7 +332,7 @@
                         </select>
                         
                         <div class="container-outra" style="display: ${isOutra ? 'flex' : 'none'}; width: 100%; gap: 5px;">
-                            <input type="text" class="input-funcao-outra" placeholder="Digite a função..." value="${isOutra ? funcaoInicial : ''}" style="width: 100%;">
+                            <input type="text" class="input-funcao-outra" placeholder="Digite a função..." value="${isOutra ? esc(funcaoInicial) : ''}" style="width: 100%;">
                             <button type="button" onclick="reverterFuncao(this)" style="padding: 0 10px; background: #6c757d; color: white; border: none; border-radius: 4px; cursor: pointer;" title="Voltar para a lista">↺</button>
                         </div>
                     </div>
@@ -304,7 +345,7 @@
                 </div>
                 <div class="form-group" style="flex: 2;">
                     <label>Nome do Militar:</label>
-                    <input type="text" class="input-nome" value="${nome}" placeholder="Nome de Guerra">
+                    <input type="text" class="input-nome" value="${esc(nome)}" placeholder="Nome de Guerra">
                 </div>
                 <button type="button" class="btn-remover" onclick="this.parentElement.remove()" title="Remover Militar">X</button>
             `;
@@ -314,50 +355,144 @@
         // ==========================================
         // LÓGICA DAS OCORRÊNCIAS
         // ==========================================
-        function adicionarOcorrencia() {
+
+        // Mostra/esconde o campo de narrativa conforme o botão marcado
+        function alternarNarrativa(checkbox) {
+            const item = checkbox.closest('.ocorrencia-item');
+            item.querySelector('.grupo-narrativa').style.display = checkbox.checked ? 'block' : 'none';
+        }
+
+        function adicionarOcorrencia(dados) {
+            dados = dados || {};
+            const usarNarrativa = dados.usarNarrativa !== false;
             const container = document.getElementById('lista-ocorrencias');
             const div = document.createElement('div');
             div.className = 'ocorrencia-item';
 
             div.innerHTML = `
                 <div class="ocorrencia-header">
-                    <span>Nova Ocorrência</span>
-                    <button type="button" class="btn-remover" style="height: 30px; width: 30px; padding: 0; font-size: 12px;" onclick="this.parentElement.parentElement.remove()">X</button>
+                    <span>Ocorrência</span>
+                    <label class="toggle-narrativa">
+                        <input type="checkbox" class="oc-usar-narrativa" ${usarNarrativa ? 'checked' : ''} onchange="alternarNarrativa(this)">
+                        Incluir narrativa
+                    </label>
+                    <button type="button" class="btn-remover" style="height: 30px; width: 30px; padding: 0; font-size: 12px;" onclick="this.closest('.ocorrencia-item').remove()">X</button>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
                         <label>Tipo / Título (Opcional):</label>
-                        <input type="text" class="oc-tipo" placeholder="Ex: Captura de animal(cobra)">
+                        <input type="text" class="oc-tipo" placeholder="Ex: Captura de animal(cobra)" value="${esc(dados.tipo)}">
                     </div>
                     <div class="form-group">
                         <label>Sinesp CAD:</label>
-                        <input type="text" class="oc-sinesp" placeholder="Ex: COB-6BBM...">
+                        <input type="text" class="oc-sinesp" placeholder="Ex: COB-6BBM..." value="${esc(dados.sinesp)}">
                     </div>
                 </div>
                 <div class="form-row">
                     <div class="form-group">
                         <label>Solicitante:</label>
-                        <input type="text" class="oc-solicitante" placeholder="Nome do solicitante">
+                        <input type="text" class="oc-solicitante" placeholder="Nome do solicitante" value="${esc(dados.solicitante)}">
                     </div>
                     <div class="form-group">
                         <label>Endereço:</label>
-                        <input type="text" class="oc-endereco" placeholder="Local da ocorrência">
+                        <input type="text" class="oc-endereco" placeholder="Local da ocorrência" value="${esc(dados.endereco)}">
                     </div>
                 </div>
-                <div class="form-group">
+                <div class="form-group grupo-narrativa" style="display: ${usarNarrativa ? 'block' : 'none'};">
                     <label>Narrativa:</label>
-                    <textarea class="oc-narrativa" rows="3" placeholder="A GUARNIÇÃO FOI COMUNICADA..."></textarea>
+                    <textarea class="oc-narrativa" rows="3" placeholder="A GUARNIÇÃO FOI COMUNICADA...">${esc(dados.narrativa)}</textarea>
                 </div>
             `;
             container.appendChild(div);
         }
 
         // ==========================================
+        // IMPORTAÇÃO AUTOMÁTICA DO TEXTO DO SISTEMA
+        // ==========================================
+        const ROTULOS_SISTEMA = [
+            'Protocolo',
+            'Agência/Região de atuação',
+            'Data/Hora de criação',
+            'Fuso horário de criação',
+            'Natureza',
+            'Endereço',
+            'Ponto de Referência',
+            'Maps',
+            'Solicitante',
+            'Narrativa',
+            'Emitido por'
+        ];
+
+        // Lê um bloco de texto do sistema e devolve {rótulo: valor}
+        function extrairCampos(texto) {
+            const nomes = ROTULOS_SISTEMA.map(r => r.replace(/[.*+?^${}()|[\]\\\/]/g, '\\$&')).join('|');
+            const regex = new RegExp('^[ \\t]*(' + nomes + ')[ \\t]*:', 'gim');
+            const achados = [];
+            let m;
+            while ((m = regex.exec(texto)) !== null) {
+                achados.push({ rotulo: m[1].toLowerCase(), inicio: m.index, fimRotulo: regex.lastIndex });
+            }
+            const campos = {};
+            achados.forEach((a, i) => {
+                const fim = i + 1 < achados.length ? achados[i + 1].inicio : texto.length;
+                campos[a.rotulo] = texto.slice(a.fimRotulo, fim).trim();
+            });
+            return campos;
+        }
+
+        // Tira espaços duplos e põe maiúscula no início das frases
+        function limparNarrativa(txt) {
+            let t = (txt || '').replace(/\s+/g, ' ').trim();
+            t = t.replace(/(^|[.!?]\s+)([a-zà-ú])/g, (_, ini, letra) => ini + letra.toUpperCase());
+            return t;
+        }
+
+        function importarOcorrencias() {
+            const campoColar = document.getElementById('colar-sistema');
+            const msg = document.getElementById('msg-importar');
+            const texto = campoColar.value;
+
+            // Cada "Protocolo:" inicia uma nova ocorrência (permite colar várias de uma vez)
+            const blocos = texto.split(/(?=^[ \t]*Protocolo[ \t]*:)/im)
+                .filter(b => /^[ \t]*(Protocolo|Natureza)[ \t]*:/im.test(b));
+
+            if (blocos.length === 0) {
+                msg.style.color = '#dc3545';
+                msg.innerText = 'Nenhuma ocorrência encontrada no texto colado.';
+                return;
+            }
+
+            // Remove blocos de ocorrência vazios (o que vem em branco por padrão)
+            document.querySelectorAll('.ocorrencia-item').forEach(item => {
+                const vazio = ['.oc-tipo', '.oc-sinesp', '.oc-solicitante', '.oc-endereco', '.oc-narrativa']
+                    .every(sel => item.querySelector(sel).value.trim() === '');
+                if (vazio) item.remove();
+            });
+
+            blocos.forEach(bloco => {
+                const c = extrairCampos(bloco);
+                const narrativa = limparNarrativa(c['narrativa']);
+                adicionarOcorrencia({
+                    tipo: c['natureza'] || '',
+                    sinesp: c['protocolo'] || '',
+                    solicitante: c['solicitante'] || '',
+                    endereco: c['endereço'] || '',
+                    narrativa: narrativa,
+                    usarNarrativa: narrativa !== ''
+                });
+            });
+
+            campoColar.value = '';
+            msg.style.color = '#28a745';
+            msg.innerText = `✅ ${blocos.length} ocorrência(s) preenchida(s)!`;
+            setTimeout(() => { msg.innerText = ''; }, 4000);
+        }
+
+        // ==========================================
         // INICIALIZAÇÃO DA PÁGINA
         // ==========================================
         window.addEventListener('DOMContentLoaded', () => {
-            // Removido o preenchimento automático da guarnição.
-            // A lista iniciará vazia e você adiciona manualmente clicando no botão.
+            // A lista de guarnição inicia vazia: adicione manualmente clicando no botão.
 
             // Deixa 1 bloco de ocorrência vazio por padrão
             adicionarOcorrencia();
@@ -415,6 +550,7 @@
                     const endereco = bloco.querySelector('.oc-endereco').value;
                     const narrativa = bloco.querySelector('.oc-narrativa').value;
                     const sinesp = bloco.querySelector('.oc-sinesp').value;
+                    const usarNarrativa = bloco.querySelector('.oc-usar-narrativa').checked;
 
                     ocorrenciasTexto += `${index + 1}° Ocorrência.\n`;
                     if (tipo.trim() !== '') {
@@ -422,7 +558,9 @@
                     }
                     ocorrenciasTexto += `Solicitante: ${solicitante}\n`;
                     ocorrenciasTexto += `Endereço: ${endereco}\n`;
-                    ocorrenciasTexto += `Narrativa: ${narrativa}\n`;
+                    if (usarNarrativa) {
+                        ocorrenciasTexto += `Narrativa: ${narrativa}\n`;
+                    }
                     ocorrenciasTexto += `Sinesp CAD: ${sinesp}\n\n`;
                 });
             }
